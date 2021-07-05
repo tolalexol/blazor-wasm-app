@@ -23,7 +23,7 @@ jobs:
       - name: Setup .NET 5
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0
+          dotnet-version: 5.0.x
           include-prerelease: false
 
       # Runs a single command using the runners shell
