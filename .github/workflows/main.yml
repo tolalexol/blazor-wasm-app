@@ -6,7 +6,7 @@ name: Deploy to GitHub Pages
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main] 
+    branches: [ main ] 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -28,19 +28,16 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Publish .NET Core Project
-        run: dotnet publish BlazorWasmApp.csproj -c Release --output release --nologo
+        run: dotnet publish -c Release --nologo
       
-      - name: Change base-tag in index.html from / to BlazorWasmApp
-        run: sed -i 's/<base href="\/" \/>/<base href="\/BlazorWasmApp\/" \/>/g' release/wwwroot/index.html
+      - name: Change base-tag in index.html from / to the necessary
+        run: sed -i 's/<base href="\/" \/>/<base href="\/TypeInfo\/" \/>/g' ./TypeInfoApp/bin/release/net6.0/publish/wwwroot/index.html
       
       - name: Add .nojekyll file
-        run: touch release/wwwroot/.nojekyll
+        run: touch ./bin/release/net6.0/publish/wwwroot/.nojekyll
       
-      - name: Copy index.html to 404.html
-        run: cp release/wwwroot/index.html release/wwwroot/404.html
-      
-      - name: Uploading files to gh-pages branch
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+      - uses: JamesIves/github-pages-deploy-action@4.1.4
+        name: gh-pages publish
         with:
           branch: gh-pages
-          folder: release/wwwroot
+          folder: ./bin/release/net6.0/publish/wwwroot
