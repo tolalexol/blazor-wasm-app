@@ -31,7 +31,7 @@ jobs:
         run: dotnet publish -c Release --nologo
       
       - name: Change base-tag in index.html from / to the necessary
-        run: sed -i 's/<base href="\/" \/>/<base href="\/BaseWasmApp\/" \/>/g' ./bin/release/net5.0/publish/wwwroot/index.html
+        run: sed -i 's/<base href="\/" \/>/<base href="\/BaseWasmApp\/" \/>/g' /home/runner/work/blazor-wasm-app/blazor-wasm-app/bin/release/net5.0/publish/wwwroot/index.html
       
       - name: Add .nojekyll file
         run: touch ./bin/release/net5.0/publish/wwwroot/.nojekyll
