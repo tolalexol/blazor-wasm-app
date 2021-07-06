@@ -30,14 +30,14 @@ jobs:
       - name: Publish .NET Core Project
         run: dotnet publish -c Release --nologo
       
-      - name: Change base-tag in index.html from / to the necessary
-        run: sed -i 's/<base href="\/" \/>/<base href="\/BaseWasmApp\/" \/>/g' ./bin/Release/net5.0/publish/wwwroot/index.html
+      #- name: Change base-tag in index.html from / to the necessary
+      #  run: sed -i 's/<base href="\/" \/>/<base href="\/BaseWasmApp\/" \/>/g' ./bin/Release/net5.0/publish/wwwroot/index.html
       
       - name: Add .nojekyll file
         run: touch ./bin/Release/net5.0/publish/wwwroot/.nojekyll
       
       - uses: JamesIves/github-pages-deploy-action@4.1.4
-        name: gh-pages publish
+        name: Publish to GitHub Pages
         with:
           branch: gh-pages
           folder: ./bin/Release/net5.0/publish/wwwroot
