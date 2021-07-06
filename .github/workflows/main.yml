@@ -30,8 +30,8 @@ jobs:
       - name: Publish .NET Core Project
         run: dotnet publish -c Release --nologo
       
-      #- name: Change base-tag in index.html from / to the necessary
-      #  run: sed -i 's/<base href="\/" \/>/<base href="\/BaseWasmApp\/" \/>/g' ./bin/Release/net5.0/publish/wwwroot/index.html
+      - name: Change base-tag in index.html from / to the necessary
+        run: sed -i 's/<base href="\/" \/>/<base href="\/BlazorWasmApp\/" \/>/g' ./bin/Release/net5.0/publish/wwwroot/index.html
       
       - name: Add .nojekyll file
         run: touch ./bin/Release/net5.0/publish/wwwroot/.nojekyll
