@@ -1,0 +1,132 @@
+﻿@page "/jsonpathevaluator"
+@using Newtonsoft.Json.Linq
+@using Newtonsoft.Json
+@using BlazorMonaco
+<h3>JSONPath Evaluator</h3>
+
+<div class="row">
+    <div class="col-xl">
+        <div class="form-group">
+            <input id="jsonPath" class="form-control" placeholder="Put JSONPath syntax" value="@_inputJsonPath"
+                   @oninput="@(async e => { _inputJsonPath = e?.Value?.ToString(); await Validate(); })">
+            <span class="help-block">
+                Example '$.phoneNumbers[*].type' See also
+                <a href="https://goessner.net/articles/JsonPath/index.html#e2" target="_blank">JSONPath expressions</a>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header" id="inputHeader">
+                <h4 data-toggle="collapse" data-target="#inputCollapse" aria-expanded="true" aria-controls="inputCollapse">JSON</h4>
+            </div>
+            <div id="inputCollapse" class="collapse show" aria-labelledby="inputHeader">
+                <div class="card-body">
+                    <MonacoEditor @ref="_inputJsonEditor" CssClass="editor" ConstructionOptions="ConfigureInputJsonEditor"
+                                  OnDidChangeModelContent="Validate" OnDidInit="Validate" />
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-header" id="outputHeader">
+                <h4 data-toggle="collapse" data-target="#outputCollapse" aria-expanded="true" aria-controls="outputCollapse">Evaluation Result</h4>
+            </div>
+            <div id="outputCollapse" class="collapse show" aria-labelledby="outputHeader">
+                <div class="card-body">
+                    <MonacoEditor @ref="_outputJsonEditor" CssClass="editor" ConstructionOptions="ConfigureOutputJsonEditor" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+    private MonacoEditor _inputJsonEditor;
+
+    private MonacoEditor _outputJsonEditor;
+
+    private static string _outputJson;
+    
+    private string _inputJsonPath = "$.phoneNumbers[*].type";
+    
+    private static string InputJson = @"{
+    ""firstName"": ""Ivan"",
+    ""lastName"" : ""Ivanov"",
+    ""age"" : 26,
+    ""address"" : {
+        ""streetAddress"": ""Kremlevskaya naberezjnaya"",
+        ""city"" : ""Moscow"",
+        ""postalCode"" : 119019
+    },
+    ""phoneNumbers"": [
+        {
+            ""type"": ""iPhone"",
+            ""number"": 9012345678
+        },
+        {
+            ""type"": ""Home"",
+            ""number"": 9012345678
+        }
+    ]
+}";
+    
+    private static StandaloneEditorConstructionOptions ConfigureInputJsonEditor(MonacoEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "json",
+            Value = InputJson,
+            FormatOnPaste = true,
+            FormatOnType = true
+        };
+    }
+    
+    private static StandaloneEditorConstructionOptions ConfigureOutputJsonEditor(MonacoEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "json",
+            Value = _outputJson,
+            ReadOnly = true
+        };
+    }
+
+    private async Task Validate()
+    {
+        string result;
+
+        try
+        {
+            InputJson = await _inputJsonEditor.GetValue();
+            
+            var root = JToken.Parse(InputJson);
+            var tokens = root.SelectTokens(_inputJsonPath, false).ToList();
+
+            result = tokens.Any()
+                ? JsonConvert.SerializeObject(
+                    tokens.Count > 1 ? tokens : tokens.First(),
+                    Formatting.Indented)
+                : "No match";
+        }
+        catch (Exception ex)
+        {
+            result = ex.Message;
+        }
+
+        _outputJson = String.IsNullOrEmpty(result)
+            ? "No match"
+            : result;
+
+        await _outputJsonEditor.SetValue(_outputJson);
+    }
+
+}
